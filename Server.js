@@ -88,3 +88,17 @@ gameServer.define("battle_room", BattleRoom);
 server.listen(3000, () => {
     console.log("Server is running on ws://localhost:3000");
 });
+
+this.onMessage("attack", (client, message) => {
+    const targetClient = this.clients.find(c => c.sessionId !== client.sessionId);
+    if (targetClient) {
+        const targetPlayer = this.players[targetClient.sessionId];
+        targetPlayer.health -= message.damage;
+
+        if (targetPlayer.health <= 0) {
+            // پایان بازی و اعلام برنده
+            this.broadcast("game_over", { winner: client.sessionId });
+        }
+    }
+});
+
